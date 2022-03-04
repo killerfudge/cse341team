@@ -8,6 +8,7 @@ const mongoose = require('mongoose');
 
 
 // TODO import routes
+const budgetRoutes = require('./routes/budget');
 
 const MONGODB_URL = process.env.MONGODB_URL;
 const app = express();
@@ -20,6 +21,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // TODO use imported routes
+app.use(budgetRoutes);
 
 mongoose.connect(MONGODB_URL)
 .then( result => {
