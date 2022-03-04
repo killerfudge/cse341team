@@ -1,10 +1,18 @@
 @import url('https://fonts.googleapis.com/css2?family=Hubballi&display=swap');
 
+/* Color Palette */
+:root {
+    --grey: #2C3531;
+    --green: #116466;
+    --tan: #D9B08C;
+    --light_tan: #FFCB9A;
+    --light_blue: #D1E8E2;
+}
+
 html,
 body {
     margin: 0;
     font-family: 'Hubballi', cursive;
-    background-color: #2C3531;
 }
 
 /*************************************************
@@ -13,8 +21,8 @@ body {
 .nav_bar {
     width: 100vw;
     height: 10vh;
-    background-color: #116466;
-    color: #D1E8E2;
+    background-color: var(--grey);
+    color: var(--light_blue);
 
     display: flex;
     flex-direction: row;
@@ -23,6 +31,7 @@ body {
 }
 
 .nav_spacer {
+    height: 100%;
     width: 80%;
 
     display: flex;
@@ -36,24 +45,41 @@ body {
 }
 
 .nav_btn_container {
+    height: 100%;
     display: flex;
     flex-direction: row;
     align-items: center;
 }
 
-.nav_link {
-    margin: 20px;
-    font-size: 1.5rem;
-    color: #D1E8E2;
-    text-decoration: none;
+.nav_link_container {
+    height: 100%;
+    width: 5vw;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 
     transition-timing-function: ease;
     transition-duration: 0.5s;
 }
 
-.nav_link:hover {
-    color: #FFCB9A;
+.nav_link_container:hover {
+    background-color: var(--green);
 
     transition-timing-function: ease;
     transition-duration: 0.5s;
+}
+
+.nav_link {
+    width: 100%;
+    height: 100%;
+    font-size: 1.5rem;
+    color: var(--light_blue);
+    text-decoration: none;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
