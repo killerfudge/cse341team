@@ -10,6 +10,9 @@ exports.postLogin = (req, res, next) => {
     const email = req.body.email;
     const password = req.body.password;
 
+    console.log(email);
+    console.log(password);
+
     User.findOne({email: email})
         .then(user => {
             if(!user) {
