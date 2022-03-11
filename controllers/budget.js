@@ -1,5 +1,11 @@
-exports.getIndex = (req, res, next) => {
-    res.render('budget/main', {
-        pageTitle: 'Budget'
-    })
+exports.getBudget = (req, res, next) => {
+
+}
+
+exports.addBudgetItem = (req, res, next) => {
+
+}
+
+exports.editBudgetItem = (req, res, next) => {
+
 }
