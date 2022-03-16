@@ -38,7 +38,7 @@ exports.deleteUser = (req, res, next) => {
   }
 };
 
-// Update User
+// Update User - optional
 exports.updateUser = (req, res, next) => {
   getUserId();
   const saltRounds = 10;
