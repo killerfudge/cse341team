@@ -7,6 +7,7 @@ exports.postCreateUser = (req, res, next) => {
   const password = req.body.password;
   const dateId = Date.now();
   const saltRounds = 10;
+  let items = [{}];
 
   password = bcrypt.hash(password, saltRounds, (err, hash) => {
     return password;
@@ -16,6 +17,7 @@ exports.postCreateUser = (req, res, next) => {
     email: email,
     password: password,
     date: dateId,
+    budget: items,
   });
   try {
     const newUser = await user.save();
@@ -29,7 +31,7 @@ exports.postCreateUser = (req, res, next) => {
 exports.deleteUser = (req, res, next) => {
   getUserId();
   try {
-    res.User.remove();
+    res.user.remove();
     res.json({ message: "User has been deleted from database" });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -42,17 +44,17 @@ exports.updateUser = (req, res, next) => {
   const saltRounds = 10;
 
   if (req.body.email != null) {
-    res.User.email = req.body.email;
+    res.user.email = req.body.email;
   }
 
   if (req.body.password != null) {
-    res.User.password = bcrypt.hash(password, saltRounds, (err, hash) => {
+    res.user.password = bcrypt.hash(password, saltRounds, (err, hash) => {
       return password;
     });
   }
 
   try {
-    const updatedUser = await res.User.save();
+    const updatedUser = await res.user.save();
     res.json(updatedUser);
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -71,7 +73,7 @@ async function getUserId(req, res, next) {
     return res.status(500).json({ message: err.message });
   }
 
-  res.User = user;
+  res.user = user;
 
   next();
 }
