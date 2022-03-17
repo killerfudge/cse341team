@@ -5,78 +5,76 @@ const User = require("../models/user");
 exports.postCreateUser = (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
+
   const dateId = Date.now();
-  const saltRounds = 10;
+  const saltRounds = 12;
   let items = [{}];
 
-  password = bcrypt.hash(password, saltRounds, (err, hash) => {
-    return password;
-  });
-
-  const user = new User({
-    email: email,
-    password: password,
-    date: dateId,
-    budget: items,
-  });
-  try {
-    const newUser = await user.save();
-    res.status(201).json(newUser);
-  } catch (err) {
-    res.status(400).json({ message: err.message });
-  }
+  bcrypt
+  .hash(password, saltRounds)
+  .then(hashedPassword => {
+    const user = new User({
+      email: email,
+      password: hashedPassword,
+      date: dateId,
+      budget: items,
+    });
+    user.save();
+  })
+  .then(result => {
+      res.json({msg: "Success"});
+  })
+  .catch(err => {
+      console.log(err);
+  })
 };
 
 // Deleting User
 exports.deleteUser = (req, res, next) => {
-  getUserId();
-  try {
-    res.user.remove();
-    res.json({ message: "User has been deleted from database" });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
+  const email = req.body.email;
+
+  User.findOneAndDelete({ email: email }).then(user => {
+      res.json({msg: "User Deleted"});
+  });
 };
 
 // Update User - optional
 exports.updateUser = (req, res, next) => {
-  getUserId();
-  const saltRounds = 10;
+  const email = req.body.email;
+  const newEmail = req.body.newEmail;
+  const newPassword = req.body.newPassword;
 
-  if (req.body.email != null) {
-    res.user.email = req.body.email;
-  }
+  const saltRounds = 12;
 
-  if (req.body.password != null) {
-    res.user.password = bcrypt.hash(password, saltRounds, (err, hash) => {
-      return password;
-    });
-  }
-
-  try {
-    const updatedUser = await res.user.save();
-    res.json(updatedUser);
-  } catch (err) {
-    res.status(400).json({ message: err.message });
-  }
+  User.findOne({ email: email }).then(user => {
+      if(!user){
+        res.json({
+            msg: "No account found"
+        });
+      } else {
+        if (newEmail != undefined) {
+            user.email = newEmail;
+            user.save();
+            res.json({
+                msg: "Updated user email"
+            });
+        } else if (newPassword != undefined) {
+            console.log(newPassword);
+            bcrypt
+            .hash(newPassword, saltRounds)
+            .then(hashedPass => {
+                user.password = hashedPass;
+                user.save();
+            })
+            .then(result => {
+                res.json({
+                    msg: "Updated user password"
+                });
+            })
+        }
+      }
+  })
 };
-
-// Selecting user by id
-async function getUserId(req, res, next) {
-  let user;
-  try {
-    user = await User.findById(req.params.dateId);
-    if (user == null) {
-      return res.status(404).json({ message: "User could not be found" });
-    }
-  } catch (err) {
-    return res.status(500).json({ message: err.message });
-  }
-
-  res.user = user;
-
-  next();
-}
 
 // Authenticate user
 exports.postLogin = (req, res, next) => {
