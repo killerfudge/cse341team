@@ -9,4 +9,6 @@ router.post ('/add-item', budgetController.addBudgetItem);
 
 router.patch ('/edit-item', budgetController.editBudgetItem);
 
+router.delete('/budget/:budgetId', budgetController.deleteBudgetItem);
+
 module.exports = router;
