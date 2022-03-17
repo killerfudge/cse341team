@@ -14,7 +14,7 @@ const budgetItemSchema = new Schema({
     type: String,
     required: false
   },
-  acctualCost: {
+  actualCost: {
     type: Number,
     required: false
   },
