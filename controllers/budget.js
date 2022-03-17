@@ -1,24 +1,48 @@
 const { default: mongoose } = require('mongoose');
 const BudgetItem = require('../models/budget-item');
+const User = require('../models/user');
 
 exports.getBudget = (req, res, next) => {
 
 }
 
+exports.getOneBudgetItem = (req, res, next) =>{
+
+}
+
+//Adds acutual cost to a budget item with given budget Item id and acutal cost
+exports.addActualCost = (req, res, next) => {
+    const budgetItemId = req.body.budgetItemId;
+    const actualCost = req.body.actualCost;
+    BudgetItem.findOne({_id: budgetItemId}).then( budgetItem => {
+        budgetItem.actualCost = actualCost;
+        budgetItem.save();
+    }).then(result =>{
+        res.json({msg:"Actual cost added/updated"});
+    })
+}
+
+//Adds the initial BudgetItem with name, planned cost, description, date and user email is used to associated with user who created it
 exports.addBudgetItem = (req, res, next) => {
     const budgetItemName = req.body.budgetItemName;
-    const plannedCost = req.body.budgetItemName;
+    const plannedCost = req.body.plannedCost;
     const description = req.body.description;
+    const email = req.body.email;
     const date = Date.now();
-    const userId = new ObjectId("62298c1f50fc66792895406e");
 
     const budgetItem = new BudgetItem({
         budgetItemName: budgetItemName,
-          plannedCost: plannedCost,
-          description: description,
-          date: date,
-          userId: userId
+        plannedCost: plannedCost,
+        description: description,
+        date: date,
     });
+    User.findOne({email: email}).then(user =>{
+        budgetItem.userId = user._id;
+        budgetItem.save();
+    }).then(result => {
+        res.json({meg:"Yay Budget Item Added!"});
+    });
+    
 }
 
 exports.editBudgetItem = (req, res, next) => {
