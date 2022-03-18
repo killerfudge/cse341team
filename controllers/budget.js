@@ -39,10 +39,11 @@ exports.addBudgetItem = (req, res, next) => {
     User.findOne({email: email}).then(user =>{
         budgetItem.userId = user._id;
         budgetItem.save();
+        user.budget.items.push({budgetItemId: budgetItem._id});
+        user.save();
     }).then(result => {
         res.json({meg:"Yay Budget Item Added!"});
-    });
-    
+    }); 
 }
 
 exports.editBudgetItem = (req, res, next) => {
