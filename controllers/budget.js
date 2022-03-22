@@ -7,7 +7,10 @@ exports.getBudget = (req, res, next) => {
 }
 
 exports.getOneBudgetItem = (req, res, next) =>{
-
+    const budgetId = req.body._id;
+    BudgetItem.findById(budgetId).then(budgetItem =>{
+    res.json(budgetItem);
+    })
 }
 
 //Adds acutual cost to a budget item with given budget Item id and acutal cost

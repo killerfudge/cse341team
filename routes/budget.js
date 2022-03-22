@@ -3,7 +3,9 @@ const express = require('express');
 const budgetController = require('../controllers/budget');
 const router = express.Router();
 
-router.get('/', budgetController.getBudget);
+router.get('/getBudget', budgetController.getBudget);
+
+router.get('/getOneBudgetItem', budgetController.getOneBudgetItem);
 
 router.post ('/add-item', budgetController.addBudgetItem);
 
