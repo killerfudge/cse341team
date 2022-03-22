@@ -37,7 +37,7 @@ exports.addBudgetItem = (req, res, next) => {
         budgetItemName: budgetItemName,
         plannedCost: plannedCost,
         description: description,
-        date: date,
+        date: date
     });
     User.findOne({email: email}).then(user =>{
         budgetItem.userId = user._id;
@@ -45,7 +45,7 @@ exports.addBudgetItem = (req, res, next) => {
         user.budget.items.push({budgetItemId: budgetItem._id});
         user.save();
     }).then(result => {
-        res.json({meg:"Yay Budget Item Added!"});
+        res.json({meg:"Yay Budget Item Added!", budgetId: budgetItem._id});
     }); 
 }
 
