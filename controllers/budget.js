@@ -72,6 +72,14 @@ exports.editBudgetItemPlannedCost = (req, res, next) => {
         budgetItem.save();
     }).then(result =>{res.json({msg:"Cost Updated"})})
 };
+exports.editBudgetItemDescription = (req, res, next) => {
+    const budgetId = req.body.budgetId;
+    const newItem = req.body.newItemDescription;
+    BudgetItem.findById(budgetId).then(budgetItem => {
+        budgetItem.description = newItem;
+        budgetItem.save();
+    }).then(result =>{res.json({msg:"Description Updated"})})
+};
 
 //Controller for deleting budgetItem from budget-item schema and budgetitemId from user.
 //Json values will be email and budgetItemId

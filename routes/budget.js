@@ -15,6 +15,8 @@ router.patch ('/edit-itemName', budgetController.editBudgetItemName);
 
 router.patch ('/edit-itemPlannedCost', budgetController.editBudgetItemPlannedCost);
 
+router.patch ('/edit-itemDescription', budgetController.editBudgetItemDescription);
+
 router.delete('/delete-budget', budgetController.deleteBudgetItem);
 
 module.exports = router; 
