@@ -7,7 +7,7 @@ exports.getBudget = (req, res, next) => {
   User.findOne({ email: email })
     .populate('budget.items.budgetItemId')
     .then(user => {
-      res.json(user.budget);
+      res.json(user.budget); 
     })
 }
 
@@ -54,8 +54,22 @@ exports.addBudgetItem = (req, res, next) => {
     }); 
 }
 
-exports.editBudgetItem = (req, res, next) => {
+exports.editBudgetItemName = (req, res, next) => {
+    const budgetId = req.body.budgetId;
+    const newItem = req.body.newItemName;
+    BudgetItem.findById(budgetId).then(budgetItem => {
+        budgetItem.budgetItemName = newItem;
+        budgetItem.save();
+    }) 
+};
 
+exports.editBudgetItemPlannedCost = (req, res, next) => {
+    const budgetId = req.body.budgetId;
+    const newItem = req.body.newItemPlannedCost;
+    BudgetItem.findById(budgetId).then(budgetItem => {
+        budgetItem.plannedCost = newItem;
+        budgetItem.save();
+    }) 
 };
 
 //Controller for deleting budgetItem from budget-item schema and budgetitemId from user.

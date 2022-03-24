@@ -11,8 +11,10 @@ router.post ('/add-item', budgetController.addBudgetItem);
 
 router.patch ('/add-actualCost', budgetController.addActualCost);
 
-router.patch ('/edit-item', budgetController.editBudgetItem);
+router.patch ('/edit-itemName', budgetController.editBudgetItemName);
+
+router.patch ('/edit-itemPlannedCost', budgetController.editBudgetItemPlannedCost);
 
 router.delete('/delete-budget', budgetController.deleteBudgetItem);
 
-module.exports = router;
+module.exports = router; 
