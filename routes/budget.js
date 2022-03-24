@@ -13,6 +13,6 @@ router.patch ('/add-actualCost', budgetController.addActualCost);
 
 router.patch ('/edit-item', budgetController.editBudgetItem);
 
-router.delete('/budget/:budgetId', budgetController.deleteBudgetItem);
+router.delete('/delete-budget', budgetController.deleteBudgetItem);
 
 module.exports = router;
