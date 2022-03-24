@@ -60,7 +60,8 @@ exports.editBudgetItemName = (req, res, next) => {
     BudgetItem.findById(budgetId).then(budgetItem => {
         budgetItem.budgetItemName = newItem;
         budgetItem.save();
-    }) 
+    }).then(result => {res.json({msg:"Name Updated"})
+    })
 };
 
 exports.editBudgetItemPlannedCost = (req, res, next) => {
@@ -69,7 +70,7 @@ exports.editBudgetItemPlannedCost = (req, res, next) => {
     BudgetItem.findById(budgetId).then(budgetItem => {
         budgetItem.plannedCost = newItem;
         budgetItem.save();
-    }) 
+    }).then(result =>{res.json({msg:"Cost Updated"})})
 };
 
 //Controller for deleting budgetItem from budget-item schema and budgetitemId from user.
