@@ -3,7 +3,12 @@ const BudgetItem = require('../models/budget-item');
 const User = require('../models/user');
 
 exports.getBudget = (req, res, next) => {
-
+  const email = req.body.email;
+  User.findOne({ email: email })
+    .populate('budget.items.budgetItemId')
+    .then(user => {
+      res.json(user.budget);
+    })
 }
 
 exports.getOneBudgetItem = (req, res, next) =>{
