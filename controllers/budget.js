@@ -12,7 +12,10 @@ exports.getBudget = (req, res, next) => {
 }
 
 exports.getOneBudgetItem = (req, res, next) =>{
-
+    const budgetId = req.body._id;
+    BudgetItem.findById(budgetId).then(budgetItem =>{
+    res.json(budgetItem);
+    })
 }
 
 //Adds acutual cost to a budget item with given budget Item id and acutal cost
@@ -39,7 +42,7 @@ exports.addBudgetItem = (req, res, next) => {
         budgetItemName: budgetItemName,
         plannedCost: plannedCost,
         description: description,
-        date: date,
+        date: date
     });
     User.findOne({email: email}).then(user =>{
         budgetItem.userId = user._id;
@@ -47,7 +50,7 @@ exports.addBudgetItem = (req, res, next) => {
         user.budget.items.push({budgetItemId: budgetItem._id});
         user.save();
     }).then(result => {
-        res.json({meg:"Yay Budget Item Added!"});
+        res.json({meg:"Yay Budget Item Added!", budgetId: budgetItem._id});
     }); 
 }
 
@@ -55,24 +58,42 @@ exports.editBudgetItem = (req, res, next) => {
 
 };
 
+//Controller for deleting budgetItem from budget-item schema and budgetitemId from user.
+//Json values will be email and budgetItemId
 exports.deleteBudgetItem = (req, res, next) => {
-    const budgetItemId = req.params.budgetId;
-    BudgetItem.findById(budgetItemId)
+    const email = req.body.email;
+    const budgetId = req.body.budgetId;
+    
+    User.findOne({ email: email })
+        .then(user =>{
+            if(!user){
+                const error = new Error("Could not find the User!!");
+                error.statusCode = 404;
+                throw error;
+            }
+            
+            const ids = user.budget.items;
+            let userBudgetId;
+            ids.forEach(id =>{
+                console.log("BudgetItem : "+typeof(id.budgetItemId) )
+                const budgetString = id.budgetItemId.toString();
+                if(!budgetString.localeCompare(budgetId)){
+                    userBudgetId = id._id;
+                }
+            })
+            user.budget.items.pull({_id:userBudgetId});
+            return user.save();
+        })
+        .then(result => {
+            return BudgetItem.findById(budgetId)
+        })
         .then(budgetItem => {
             if(!budgetItem){
                 const error = new Error("Could not find the budget.");
                 error.statusCode = 404;
                 throw error;
             }
-            // Once login function is ready, we can use this code
-
-            // if(budgetItem.userId.toString() !== req.userId){
-            //     const error = new Error("Not Authorized!");
-            //     error.statusCode = 403;
-            //     throw error;
-            // }
-
-            return BudgetItem.findByIdAndRemove(budgetItemId);
+            return BudgetItem.findByIdAndRemove(budgetId);
         })
         .then(result => {
             res.status(200).json({message: "Deleted Budget"});
