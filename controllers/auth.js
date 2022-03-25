@@ -1,5 +1,6 @@
 const bcrypt = require("bcryptjs");
 const User = require("../models/user");
+const jwt = require("jsonwebtoken");
 
 // Create user
 exports.postCreateUser = (req, res, next) => {
@@ -10,31 +11,36 @@ exports.postCreateUser = (req, res, next) => {
   const saltRounds = 12;
   let items = [{}];
 
+  const token = jwt.sign({ email }, process.env.TOKEN_KEY, {
+    expiresIn: "1h",
+  });
+
   bcrypt
-  .hash(password, saltRounds)
-  .then(hashedPassword => {
-    const user = new User({
-      email: email,
-      password: hashedPassword,
-      date: dateId,
-      budget: items,
-    });
-    user.save();
-  })
-  .then(result => {
-      res.json({msg: "Success"});
-  })
-  .catch(err => {
+    .hash(password, saltRounds)
+    .then((hashedPassword) => {
+      const user = new User({
+        email: email,
+        password: hashedPassword,
+        resetToken: token,
+        date: dateId,
+        budget: items,
+      });
+      user.save();
+    })
+    .then((result) => {
+      res.json({ msg: "Success" });
+    })
+    .catch((err) => {
       console.log(err);
-  })
+    });
 };
 
 // Deleting User
 exports.deleteUser = (req, res, next) => {
   const email = req.body.email;
 
-  User.findOneAndDelete({ email: email }).then(user => {
-      res.json({msg: "User Deleted"});
+  User.findOneAndDelete({ email: email }).then((user) => {
+    res.json({ msg: "User Deleted" });
   });
 };
 
@@ -46,34 +52,34 @@ exports.updateUser = (req, res, next) => {
 
   const saltRounds = 12;
 
-  User.findOne({ email: email }).then(user => {
-      if(!user){
+  User.findOne({ email: email }).then((user) => {
+    if (!user) {
+      res.json({
+        msg: "No account found",
+      });
+    } else {
+      if (newEmail != undefined) {
+        user.email = newEmail;
+        user.save();
         res.json({
-            msg: "No account found"
+          msg: "Updated user email",
         });
-      } else {
-        if (newEmail != undefined) {
-            user.email = newEmail;
+      } else if (newPassword != undefined) {
+        console.log(newPassword);
+        bcrypt
+          .hash(newPassword, saltRounds)
+          .then((hashedPass) => {
+            user.password = hashedPass;
             user.save();
+          })
+          .then((result) => {
             res.json({
-                msg: "Updated user email"
+              msg: "Updated user password",
             });
-        } else if (newPassword != undefined) {
-            console.log(newPassword);
-            bcrypt
-            .hash(newPassword, saltRounds)
-            .then(hashedPass => {
-                user.password = hashedPass;
-                user.save();
-            })
-            .then(result => {
-                res.json({
-                    msg: "Updated user password"
-                });
-            })
-        }
+          });
       }
-  })
+    }
+  });
 };
 
 // Authenticate user
