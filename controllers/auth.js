@@ -82,6 +82,56 @@ exports.updateUser = (req, res, next) => {
   });
 };
 
+/******* Login User with Token (Nathaniel Snow) Start ************/
+
+exports.userLogin = (req, res, next) => {
+  const email = req.body.email;
+  const password = req.body.password;
+  let loadedUser;
+  User.findOne({ email: email })
+    .then((user) => {
+      if (!user) {
+        const error = new Error("No user with this email could be found!");
+        error.statusCode = 401;
+        throw error;
+      }
+      loadedUser = user;
+      return bcrypt.compare(password, user.password);
+    })
+    .then((isEqual) => {
+      if (!isEqual) {
+        const error = new Error(
+          "Incorrect Password. The Police are on their way!!"
+        );
+        error.statusCode = 401;
+        throw error;
+      }
+      const token = jwt.sign(
+        {
+          email: loadedUser.email,
+          userId: loadedUser._id.toString(),
+        },
+        process.env.TOKEN_KEY,
+        { expiresIn: "1h" }
+      );
+      res
+        .status(200)
+        .json({
+          token: token,
+          userId: loadedUser._id.toString(),
+          msg: "You are logged in!",
+        });
+    })
+    .catch((err) => {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
+    });
+};
+
+/******* Login User with Token (Nathaniel Snow) End **************/
+
 // Authenticate user
 exports.postLogin = (req, res, next) => {
   const email = req.body.email;
