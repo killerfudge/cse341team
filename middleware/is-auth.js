@@ -15,5 +15,12 @@ module.exports = (req, res, next) => {
     throw error;
   }
   req.userId = decodedToken.userId;
+
+  if (req.userId != req.body._userId) {
+    const error = new Error("You are not authorized to make this change.");
+    error.statusCode = 401;
+    throw error;
+  }
+
   next();
 };

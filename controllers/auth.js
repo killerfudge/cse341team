@@ -12,7 +12,7 @@ exports.postCreateUser = (req, res, next) => {
   let items = [{}];
 
   const token = jwt.sign({ email }, process.env.TOKEN_KEY, {
-    expiresIn: "1h",
+    expiresIn: "30s",
   });
 
   bcrypt
@@ -112,15 +112,13 @@ exports.userLogin = (req, res, next) => {
           userId: loadedUser._id.toString(),
         },
         process.env.TOKEN_KEY,
-        { expiresIn: "1h" }
+        { expiresIn: "1m" }
       );
-      res
-        .status(200)
-        .json({
-          token: token,
-          userId: loadedUser._id.toString(),
-          msg: "You are logged in!",
-        });
+      res.status(200).json({
+        token: token,
+        userId: loadedUser._id.toString(),
+        msg: "You are logged in!",
+      });
     })
     .catch((err) => {
       if (!err.statusCode) {

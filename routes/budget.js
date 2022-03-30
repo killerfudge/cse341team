@@ -8,7 +8,7 @@ router.get("/getBudget", isAuth, budgetController.getBudget);
 
 router.get("/getOneBudgetItem", isAuth, budgetController.getOneBudgetItem);
 
-router.post("/add-item", budgetController.addBudgetItem);
+router.post("/add-item", isAuth, budgetController.addBudgetItem);
 
 router.patch("/add-actualCost", isAuth, budgetController.addActualCost);
 
