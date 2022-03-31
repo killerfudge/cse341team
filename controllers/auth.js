@@ -82,7 +82,7 @@ exports.updateUserEmail = (req, res, next) => {
   });
 };
 
-// Update User - optional
+// Update User Password
 exports.updateUserPassword = (req, res, next) => {
   const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -119,6 +119,7 @@ exports.updateUserPassword = (req, res, next) => {
   });
 };
 
+//Login user
 exports.loginUser = (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;

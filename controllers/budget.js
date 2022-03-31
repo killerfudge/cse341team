@@ -3,6 +3,7 @@ const { validationResult } = require('express-validator');
 const BudgetItem = require('../models/budget-item');
 const User = require('../models/user');
 
+//Get users budget
 exports.getBudget = (req, res, next) => {
 
     User.findById(req._userId)
@@ -18,6 +19,7 @@ exports.getBudget = (req, res, next) => {
     });
 }
 
+//Get user's budget Item
 exports.getOneBudgetItem = (req, res, next) =>{
     const budgetItemId = req.body.budgetItemId;
     BudgetItem.findById(budgetItemId).then(budgetItem =>{
@@ -31,7 +33,7 @@ exports.getOneBudgetItem = (req, res, next) =>{
     });
 }
 
-
+//Add's user's budget Item
 //Adds the initial BudgetItem with name, planned cost, description, date and user email is used to associated with user who created it
 exports.addBudgetItem = (req, res, next) => {
     const errors = validationResult(req);
@@ -69,6 +71,7 @@ exports.addBudgetItem = (req, res, next) => {
     }); 
 }
 
+//Adds or updates Users budget Item actual cost
 //Adds acutual cost to a budget item with given budget Item id and acutal cost
 exports.addActualCost = (req, res, next) => {
     const errors = validationResult(req);
@@ -95,6 +98,7 @@ exports.addActualCost = (req, res, next) => {
       });
 }
 
+//Edits user's budget item name
 exports.editBudgetItemName = (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -117,6 +121,7 @@ exports.editBudgetItemName = (req, res, next) => {
       });
 };
 
+//Edits user's budget item's planned cost
 exports.editPlannedCost = (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -138,6 +143,8 @@ exports.editPlannedCost = (req, res, next) => {
         next(err);
      });
 };
+
+//Edits user's budget item's description
 exports.editDescription = (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -160,8 +167,10 @@ exports.editDescription = (req, res, next) => {
     });
 };
 
+
+//Delete user's budget Item
 //Controller for deleting budgetItem from budget-item schema and budgetitemId from user.
-//Json values will be email and budgetItemId
+//Json values will be budgetItemId
 exports.deleteBudgetItem = (req, res, next) => {
     const budgetItemId = req.body.budgetItemId;
     
