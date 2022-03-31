@@ -1,19 +1,24 @@
 const bcrypt = require("bcryptjs");
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
+const { validationResult } = require('express-validator');
 
 // Create user
-exports.postCreateUser = (req, res, next) => {
+exports.createUser = (req, res, next) => {
+  const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        const error = new Error('Validation failed.');
+        error.statusCode = 422;
+        error.errors = errors.array();
+        throw error;
+    }
   const email = req.body.email;
   const password = req.body.password;
 
+  
   const dateId = Date.now();
   const saltRounds = 12;
   let items = [{}];
-
-  const token = jwt.sign({ email }, process.env.TOKEN_KEY, {
-    expiresIn: "30s",
-  });
 
   bcrypt
     .hash(password, saltRounds)
@@ -21,70 +26,100 @@ exports.postCreateUser = (req, res, next) => {
       const user = new User({
         email: email,
         password: hashedPassword,
-        resetToken: token,
         date: dateId,
         budget: items,
       });
       user.save();
     })
     .then((result) => {
-      res.json({ msg: "Success" });
+      res.status(200).json({ msg: "Successfully created User. Please log in." });
     })
-    .catch((err) => {
-      console.log(err);
-    });
+    .catch(err => {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
+  });
 };
 
 // Deleting User
 exports.deleteUser = (req, res, next) => {
-  const email = req.body.email;
 
-  User.findOneAndDelete({ email: email }).then((user) => {
-    res.json({ msg: "User Deleted" });
+  User.findByIdAndDelete(req._userId).then((user) => {
+    res.status(200).json({ msg: "User Deleted" });
+  });
+
+};
+
+
+//Update User Email
+exports.updateUserEmail = (req, res, next) => {
+  const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        const error = new Error('Validation failed.');
+        error.statusCode = 422;
+        error.errors = errors.array();
+        throw error;
+    }
+  const newEmail = req.body.newEmail;
+
+  User.findById(req._userId).then(user => {
+    if (!user) {
+      const error = new Error('No account found');
+      error.statusCode = 404;
+      throw error;
+    }
+    user.email = newEmail;
+    user.save().then( result => {
+      res.status(200).json({msg: "Updated user email"});
+    })
+    .catch(err => {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
+    });
   });
 };
 
 // Update User - optional
-exports.updateUser = (req, res, next) => {
-  const email = req.body.email;
-  const newEmail = req.body.newEmail;
+exports.updateUserPassword = (req, res, next) => {
+  const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        const error = new Error('Validation failed.');
+        error.statusCode = 422;
+        error.errors = errors.array();
+        throw error;
+    }
   const newPassword = req.body.newPassword;
 
   const saltRounds = 12;
 
-  User.findOne({ email: email }).then((user) => {
+  User.findById(req._userId).then(user => {
     if (!user) {
-      res.json({
-        msg: "No account found",
-      });
-    } else {
-      if (newEmail != undefined) {
-        user.email = newEmail;
-        user.save();
-        res.json({
-          msg: "Updated user email",
-        });
-      } else if (newPassword != undefined) {
-        console.log(newPassword);
-        bcrypt
-          .hash(newPassword, saltRounds)
-          .then((hashedPass) => {
-            user.password = hashedPass;
-            user.save();
-          })
-          .then((result) => {
-            res.json({
-              msg: "Updated user password",
-            });
-          });
-      }
+      const error = new Error('No account found');
+      error.statusCode = 404;
+      throw error;
     }
+    bcrypt
+      .hash(newPassword, saltRounds)
+      .then(hashedPass => {
+        user.password = hashedPass;
+        user.save();
+      })
+      .then((result) => {
+        res.status(200).json({msg: "Updated user password"});
+      })
+      .catch(err => {
+        if (!err.statusCode) {
+          err.statusCode = 500;
+        }
+        next(err);
+      });
   });
 };
 
-/******* Login User with Token (Nathaniel Snow) Start ************/
-
-exports.userLogin = (req, res, next) => {
+exports.loginUser = (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
   let loadedUser;
@@ -109,10 +144,10 @@ exports.userLogin = (req, res, next) => {
       const token = jwt.sign(
         {
           email: loadedUser.email,
-          userId: loadedUser._id.toString(),
+          _userId: loadedUser._id.toString(),
         },
         process.env.TOKEN_KEY,
-        { expiresIn: "1m" }
+        { expiresIn: "1h" }
       );
       res.status(200).json({
         token: token,
@@ -126,40 +161,4 @@ exports.userLogin = (req, res, next) => {
       }
       next(err);
     });
-};
-
-/******* Login User with Token (Nathaniel Snow) End **************/
-
-// Authenticate user
-exports.postLogin = (req, res, next) => {
-  const email = req.body.email;
-  const password = req.body.password;
-
-  console.log(email);
-  console.log(password);
-
-  User.findOne({ email: email }).then((user) => {
-    if (!user) {
-      return res.status(422).json({
-        error: "Email or password incorrect.",
-      });
-    }
-
-    bcrypt
-      .compare(password, user.password)
-      .then((match) => {
-        if (match) {
-          return res.status(200).json({
-            message: "User has been authenticated.",
-          });
-        } else {
-          return res.status(422).json({
-            error: "Email or password incorrect.",
-          });
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  });
 };
