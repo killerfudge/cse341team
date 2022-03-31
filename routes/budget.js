@@ -1,13 +1,14 @@
-const express = require('express');
+const express = require("express");
 
 const{body} = require('express-validator')
 
 const budgetController = require('../controllers/budget');
+const isAuth = require("../middleware/is-auth");
 const router = express.Router();
 
-router.get('/getBudget', budgetController.getBudget);
+router.get("/getBudget", isAuth, budgetController.getBudget);
 
-router.get('/getOneBudgetItem', budgetController.getOneBudgetItem);
+router.get("/getOneBudgetItem", isAuth, budgetController.getOneBudgetItem);
 
 router.post ('/add-item',[
     body('budgetItemName')
@@ -22,7 +23,7 @@ router.post ('/add-item',[
     .trim()
     .not()
     .isEmpty()
-], budgetController.addBudgetItem);
+], isAuth, budgetController.addBudgetItem);
 
 router.patch ('/add-actualCost',[
     body('budgetItemId')
@@ -33,14 +34,22 @@ router.patch ('/add-actualCost',[
     .trim()
     .not()
     .isEmpty()
-], budgetController.addActualCost);
+], isAuth, budgetController.addActualCost);
 
-router.patch ('/edit-itemName', budgetController.editBudgetItemName);
+router.patch("/edit-itemName", isAuth, budgetController.editBudgetItemName);
 
-router.patch ('/edit-itemPlannedCost', budgetController.editBudgetItemPlannedCost);
+router.patch(
+  "/edit-itemPlannedCost",
+  isAuth,
+  budgetController.editBudgetItemPlannedCost
+);
 
-router.patch ('/edit-itemDescription', budgetController.editBudgetItemDescription);
+router.patch(
+  "/edit-itemDescription",
+  isAuth,
+  budgetController.editBudgetItemDescription
+);
 
-router.delete('/delete-budget', budgetController.deleteBudgetItem);
+router.delete("/delete-budget", isAuth, budgetController.deleteBudgetItem);
 
-module.exports = router; 
+module.exports = router;
