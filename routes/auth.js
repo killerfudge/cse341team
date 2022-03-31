@@ -1,4 +1,5 @@
 const express = require("express");
+const User = require("../models/user");
 
 const{body} = require('express-validator')
 
@@ -6,23 +7,70 @@ const userController = require("../controllers/auth");
 const isAuth = require("../middleware/is-auth");
 const router = express.Router();
 
-router.post("/create-user",[
+router.post("/create-user",
+    [
     body('email')
     .trim()
-    .not()
-    .isEmpty(),
+    .isEmail()
+    .normalizeEmail()
+    .withMessage('please enter a valid email')
+    .custom(value => {
+        return User.findOne({ email: value }).then(user => {
+          if (user) {
+            return Promise.reject('E-mail already in use');
+          }
+        });
+      }),
     body('password')
     .trim()
-    .not()
-    .isEmpty()
-], userController.postCreateUser);
+    .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/, "i")
+    .withMessage('Must be 8 chars long, one uppercase, one lowercase, and one number')
+    ], 
+    userController.createUser
+);
 
-//router.post("/login", userController.postLogin);
+router.delete("/delete-user", 
+    isAuth, 
+    userController.deleteUser
+);
 
-router.post("/login", userController.userLogin);
+router.patch("/update-userEmail", 
+    isAuth,
+    [
+        body('newEmail')
+        .trim()
+        .isEmail()
+        .normalizeEmail()
+        .withMessage('please enter a valid email')
+        .custom(value => {
+            return User.findOne({ email: value }).then(user => {
+              if (user) {
+                return Promise.reject('E-mail already in use');
+              }
+            });
+          })
+    ], 
+    userController.updateUserEmail
+);
 
-router.delete("/delete-user", isAuth, userController.deleteUser);
+router.patch("/update-userPassword", 
+    isAuth,
+    [
+    body('newPassword')
+    .trim()
+    .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/, "i")
+    .withMessage('Must be 8 chars long, one uppercase, one lowercase, and one number')
+    ], 
+    userController.updateUserPassword
+);
 
-router.patch("/update-user", isAuth, userController.updateUser);
+router.post("/login",
+    [
+    body('email')
+        .trim()
+        .normalizeEmail()
+    ], 
+    userController.loginUser
+);
 
 module.exports = router;
