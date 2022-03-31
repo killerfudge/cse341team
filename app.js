@@ -28,6 +28,14 @@ app.use((req, res, next) => {
 app.use(budgetRoutes);
 app.use(userRoutes);
 
+app.use((error, req, res, next) => {
+  console.log(error);
+  const status = error.statusCode || 500;
+  const message = error.message;
+  const errors = error.errors;
+  res.status(status).json({ message: message, errors: errors });
+});
+
 mongoose.connect(MONGODB_URL)
 .then( result => {
   app.listen(PORT);

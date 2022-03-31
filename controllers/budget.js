@@ -1,14 +1,26 @@
 const { default: mongoose } = require('mongoose');
+const { validationResult } = require('express-validator');
 const BudgetItem = require('../models/budget-item');
 const User = require('../models/user');
 
 exports.getBudget = (req, res, next) => {
   const email = req.body.email;
+  if(!email){
+    const error = new Error('No email provided.');
+    error.statusCode = 422;
+    throw error;
+  }
   User.findOne({ email: email })
     .populate('budget.items.budgetItemId')
     .then(user => {
       res.json(user.budget); 
     })
+    .catch(err => {
+        if (!err.statusCode) {
+            err.statusCode = 500;
+        }
+        next(err);
+    });
 }
 
 exports.getOneBudgetItem = (req, res, next) =>{
@@ -16,22 +28,49 @@ exports.getOneBudgetItem = (req, res, next) =>{
     BudgetItem.findById(budgetId).then(budgetItem =>{
     res.json(budgetItem);
     })
+    .catch(err => {
+        if (!err.statusCode) {
+          err.statusCode = 500;
+        }
+        next(err);
+    });
 }
 
 //Adds acutual cost to a budget item with given budget Item id and acutal cost
 exports.addActualCost = (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        const error = new Error('Validation failed.');
+        error.statusCode = 422;
+        error.errors = errors.array();
+        throw error;
+    }
     const budgetItemId = req.body.budgetItemId;
     const actualCost = req.body.actualCost;
     BudgetItem.findOne({_id: budgetItemId}).then( budgetItem => {
         budgetItem.actualCost = actualCost;
         budgetItem.save();
-    }).then(result =>{
+    })
+    .then(result =>{
         res.json({msg:"Actual cost added/updated"});
     })
+    .catch(err => {
+        if (!err.statusCode) {
+          err.statusCode = 500;
+        }
+        next(err);
+      });
 }
 
 //Adds the initial BudgetItem with name, planned cost, description, date and user email is used to associated with user who created it
 exports.addBudgetItem = (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        const error = new Error('Validation failed.');
+        error.statusCode = 422;
+        error.errors = errors.array();
+        throw error;
+    }
     const budgetItemName = req.body.budgetItemName;
     const plannedCost = req.body.plannedCost;
     const description = req.body.description;
@@ -51,34 +90,78 @@ exports.addBudgetItem = (req, res, next) => {
         user.save();
     }).then(result => {
         res.json({meg:"Yay Budget Item Added!", budgetId: budgetItem._id});
-    }); 
+    })
+    .catch(err => {
+        if (!err.statusCode) {
+          err.statusCode = 500;
+        }
+        next(err);
+      }); 
 }
 
 exports.editBudgetItemName = (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        const error = new Error('Validation failed.');
+        error.statusCode = 422;
+        error.errors = errors.array();
+        throw error;
+    }
     const budgetId = req.body.budgetId;
     const newItem = req.body.newItemName;
     BudgetItem.findById(budgetId).then(budgetItem => {
         budgetItem.budgetItemName = newItem;
         budgetItem.save();
-    }).then(result => {res.json({msg:"Name Updated"})
-    })
+    }).then(result => {res.json({msg:"Name Updated"})})
+    .catch(err => {
+        if (!err.statusCode) {
+          err.statusCode = 500;
+        }
+        next(err);
+      });
 };
 
 exports.editBudgetItemPlannedCost = (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        const error = new Error('Validation failed.');
+        error.statusCode = 422;
+        error.errors = errors.array();
+        throw error;
+    }
     const budgetId = req.body.budgetId;
     const newItem = req.body.newItemPlannedCost;
     BudgetItem.findById(budgetId).then(budgetItem => {
         budgetItem.plannedCost = newItem;
         budgetItem.save();
     }).then(result =>{res.json({msg:"Cost Updated"})})
+    .catch(err => {
+        if (!err.statusCode) {
+          err.statusCode = 500;
+        }
+        next(err);
+     });
 };
 exports.editBudgetItemDescription = (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        const error = new Error('Validation failed.');
+        error.statusCode = 422;
+        error.errors = errors.array();
+        throw error;
+    }
     const budgetId = req.body.budgetId;
     const newItem = req.body.newItemDescription;
     BudgetItem.findById(budgetId).then(budgetItem => {
         budgetItem.description = newItem;
         budgetItem.save();
     }).then(result =>{res.json({msg:"Description Updated"})})
+    .catch(err => {
+        if (!err.statusCode) {
+          err.statusCode = 500;
+        }
+        next(err);
+    });
 };
 
 //Controller for deleting budgetItem from budget-item schema and budgetitemId from user.
