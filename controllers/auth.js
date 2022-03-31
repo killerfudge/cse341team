@@ -46,32 +46,79 @@ exports.updateUser = (req, res, next) => {
 
   const saltRounds = 12;
 
-  User.findOne({ email: email }).then(user => {
-      if(!user){
+  User.findOne({ email: email }).then((user) => {
+    if (!user) {
+      res.json({
+        msg: "No account found",
+      });
+    } else {
+      if (newEmail != undefined) {
+        user.email = newEmail;
+        user.save();
         res.json({
-            msg: "No account found"
+          msg: "Updated user email",
         });
-      } else {
-        if (newEmail != undefined) {
-            user.email = newEmail;
+      } else if (newPassword != undefined) {
+        console.log(newPassword);
+        bcrypt
+          .hash(newPassword, saltRounds)
+          .then((hashedPass) => {
+            user.password = hashedPass;
             user.save();
+          })
+          .then((result) => {
             res.json({
-                msg: "Updated user email"
+              msg: "Updated user password",
             });
-        } else if (newPassword != undefined) {
-            console.log(newPassword);
-            bcrypt
-            .hash(newPassword, saltRounds)
-            .then(hashedPass => {
-                user.password = hashedPass;
-                user.save();
-            })
-            .then(result => {
-                res.json({
-                    msg: "Updated user password"
-                });
-            })
-        }
+          });
+      }
+    }
+  });
+};
+
+
+
+/******* Login User with Token (Nathaniel Snow) Start ************/
+
+exports.userLogin = (req, res, next) => {
+  const email = req.body.email;
+  const password = req.body.password;
+  let loadedUser;
+  User.findOne({ email: email })
+    .then((user) => {
+      if (!user) {
+        const error = new Error("No user with this email could be found!");
+        error.statusCode = 401;
+        throw error;
+      }
+      loadedUser = user;
+      return bcrypt.compare(password, user.password);
+    })
+    .then((isEqual) => {
+      if (!isEqual) {
+        const error = new Error(
+          "Incorrect Password. The Police are on their way!!"
+        );
+        error.statusCode = 401;
+        throw error;
+      }
+      const token = jwt.sign(
+        {
+          email: loadedUser.email,
+          userId: loadedUser._id.toString(),
+        },
+        process.env.TOKEN_KEY,
+        { expiresIn: "1h" }
+      );
+      res.status(200).json({
+        token: token,
+        userId: loadedUser._id.toString(),
+        msg: "You are logged in!",
+      });
+    })
+    .catch((err) => {
+      if (!err.statusCode) {
+        err.statusCode = 500;
       }
   })
 };
