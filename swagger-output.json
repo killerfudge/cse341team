@@ -5,13 +5,13 @@
     "description": "Simple Budget API",
     "version": "1.0.0"
   },
-  "host": "localhost:3000",
+  "host": "budget-app-cse341.herokuapp.com",
   "basePath": "/",
   "schemes": [
     "http"
   ],
   "paths": {
-    "/getBudget": {
+    "/get-budget": {
       "get": {
         "description": "",
         "parameters": [],
@@ -22,7 +22,7 @@
         }
       }
     },
-    "/getOneBudgetItem": {
+    "/get-oneBudgetItem": {
       "get": {
         "description": "",
         "parameters": [],
@@ -43,6 +43,12 @@
             "schema": {
               "type": "object",
               "properties": {
+                "token": {
+                  "example": "any"
+                },
+                "userId": {
+                  "example": "any"
+                },
                 "budgetItemName": {
                   "example": "any"
                 },
@@ -51,22 +57,19 @@
                 },
                 "description": {
                   "example": "any"
-                },
-                "email": {
-                  "example": "any"
                 }
               }
             }
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
+          "201": {
+            "description": "Created"
           }
         }
       }
     },
-    "/add-actualCost": {
+    "/add_edit-actualCost": {
       "patch": {
         "description": "",
         "parameters": [
@@ -76,6 +79,12 @@
             "schema": {
               "type": "object",
               "properties": {
+                "token": {
+                  "example": "any"
+                },
+                "userId": {
+                  "example": "any"
+                },
                 "budgetItemId": {
                   "example": "any"
                 },
@@ -93,7 +102,7 @@
         }
       }
     },
-    "/edit-itemName": {
+    "/edit-budgetItemName": {
       "patch": {
         "description": "",
         "parameters": [
@@ -103,10 +112,16 @@
             "schema": {
               "type": "object",
               "properties": {
-                "budgetId": {
+                "token": {
                   "example": "any"
                 },
-                "newItemName": {
+                "userId": {
+                  "example": "any"
+                },
+                "budgetItemId": {
+                  "example": "any"
+                },
+                "budgetItemName": {
                   "example": "any"
                 }
               }
@@ -120,7 +135,7 @@
         }
       }
     },
-    "/edit-itemPlannedCost": {
+    "/edit-plannedCost": {
       "patch": {
         "description": "",
         "parameters": [
@@ -130,10 +145,16 @@
             "schema": {
               "type": "object",
               "properties": {
-                "budgetId": {
+                "token": {
                   "example": "any"
                 },
-                "newItemPlannedCost": {
+                "userId": {
+                  "example": "any"
+                },
+                "budgetItemId": {
+                  "example": "any"
+                },
+                "plannedCost": {
                   "example": "any"
                 }
               }
@@ -147,7 +168,7 @@
         }
       }
     },
-    "/edit-itemDescription": {
+    "/edit-description": {
       "patch": {
         "description": "",
         "parameters": [
@@ -157,10 +178,16 @@
             "schema": {
               "type": "object",
               "properties": {
-                "budgetId": {
+                "token": {
                   "example": "any"
                 },
-                "newItemDescription": {
+                "userId": {
+                  "example": "any"
+                },
+                "budgetItemId": {
+                  "example": "any"
+                },
+                "description": {
                   "example": "any"
                 }
               }
@@ -174,7 +201,7 @@
         }
       }
     },
-    "/delete-budget": {
+    "/delete-budgetItem": {
       "delete": {
         "description": "",
         "parameters": [
@@ -184,10 +211,13 @@
             "schema": {
               "type": "object",
               "properties": {
-                "email": {
+                "token": {
                   "example": "any"
                 },
-                "budgetId": {
+                "userId": {
+                  "example": "any"
+                },
+                "budgetItemId": {
                   "example": "any"
                 }
               }
@@ -228,6 +258,93 @@
         }
       }
     },
+    "/delete-user": {
+      "delete": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "token": {
+                  "example": "any"
+                },
+                "userId": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/update-userEmail": {
+      "patch": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "token": {
+                  "example": "any"
+                },
+                "userId": {
+                  "example": "any"
+                },
+                "newEmail": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/update-userPassword": {
+      "patch": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "token": {
+                  "example": "any"
+                },
+                "userId": {
+                  "example": "any"
+                },
+                "newPassword": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/login": {
       "post": {
         "description": "",
@@ -242,63 +359,6 @@
                   "example": "any"
                 },
                 "password": {
-                  "example": "any"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "422": {
-            "description": "Unprocessable Entity"
-          }
-        }
-      }
-    },
-    "/delete-user": {
-      "delete": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "email": {
-                  "example": "any"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/update-user": {
-      "patch": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "email": {
-                  "example": "any"
-                },
-                "newEmail": {
-                  "example": "any"
-                },
-                "newPassword": {
                   "example": "any"
                 }
               }
